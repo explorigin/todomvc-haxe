@@ -27,6 +27,6 @@ Get help from other Haxe users:
 
 * [Haxe Users Google Group](http://groups.google.com/group/haxelang?hl=en)
 * [Haxe on StackOverflow](http://stackoverflow.com/questions/tagged/haxe)
-* [Haxe on Twitter](http://twitter.com/haxe)
+* [Haxe on Twitter](http://twitter.com/haxelang)
 
 _If you have other helpful links to share, or find any of the links above no longer work, please [let us know](https://github.com/explorigin/haxe-todomvc/issues)._
