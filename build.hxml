@@ -1,0 +1,22 @@
+# The build.hxml file specifies all the command-line parameters that you would normally pass to the haxe compiler.
+
+# Add a directory for where to find source files.  You can specify multiple directories.
+-cp src
+
+# Use a slightly more minifiable Javascript output.  This will be the default in Haxe 3.2
+-D js-flatten
+
+# Create output that takes advantage of browsers that implement ECMAScript 5
+-D js-es5
+
+# Use full dead-code elimination.
+-dce full
+
+# Specify the entry-point into our application
+-main todomvc.App
+
+# Include the jQueryExtern library so we can use jQuery
+-lib jQueryExtern
+
+# create a Javascript file at js/app.js
+-js js/app.js
