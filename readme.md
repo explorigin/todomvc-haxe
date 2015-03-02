@@ -1,10 +1,10 @@
 # Haxe TodoMVC Example (with jQuery)
 
-> Haxe is a staticly-typed programming language that can be transpiled to Javascript, PHP, Java, C++, C# or Python or compiled into Flash or Neko bytecode.  Haxe has the unique advantage of code-sharing between all manner of clients and servers even though they run different servers, languages or architectures.
+Haxe is a staticly-typed programming language that can be transpiled to Javascript, PHP, Java, C++, C# or Python or compiled into Flash or Neko bytecode.  Haxe has the unique advantage of code-sharing between all manner of clients and servers even though they run different servers, languages or architectures.
 
-> _[Haxe - haxe.org](http://haxe.org)_
+_[Haxe - haxe.org](http://haxe.org)_
 
-> This demo shows the basics of how to develop client-side Javascript apps in Haxe.  Many details are included in the comments of src/todomvc/App.hx.While the Haxe standard library exposes standard Javascript and DOM APIs, we advise using a library that abstracts these since direct DOM manipulation can be verbose and unnecessarily complex.  In this example, we use jQuery.
+This demo shows the basics of how to develop client-side Javascript apps in Haxe.  Many details are included in the comments of src/todomvc/App.hx.While the Haxe standard library exposes standard Javascript and DOM APIs, we advise using a library that abstracts these since direct DOM manipulation can be verbose and unnecessarily complex.  In this example, we use jQuery.
 
 ## Building
 
