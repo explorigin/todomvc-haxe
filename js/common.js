@@ -49,7 +49,7 @@ js.Boot.__instanceof = function(o,cl) {
 	}
 };
 var todomvc = {};
-todomvc.Storable = $hx_exports.todomvc.Storable = function() { };
+todomvc.Storable = function() { };
 todomvc.Storable.__name__ = true;
 todomvc.Storable.prototype = {
 	__class__: todomvc.Storable
