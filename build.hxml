@@ -24,3 +24,31 @@
 
 # create a Javascript file at js/app.js
 -js js/app.js
+
+
+# The "next" directive allows multiple targets to be built from one hxml build file
+--next
+
+# First we define most of the compile parameters as above
+-cp src
+-debug
+-D js-es5
+
+# NOTE: We don't specify js-flatten here so that haxe exports the objects in a place that the main
+# app.js file will expect them.
+#-D js-flatten
+
+# "sharedcode" is a custom flag used in Store.hx and Todo.hx to indicate that we want this code to
+# be compiled instead of treated as an extern.
+-D sharedcode
+
+# NOTE: We don't use dead code elimination because we're not specifying an entry-point. Without an
+# entry-point, nothing would be called and DCE would eliminate everything.
+#-dce full
+
+-js js/common.js
+
+# Instead of specifying an entry-point, we specify all of the classes we want to include in this
+# file.  These should be all that are associated with the "sharedcode" directive above.
+todomvc.Store
+todomvc.Todo

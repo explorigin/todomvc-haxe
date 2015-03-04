@@ -627,7 +627,7 @@ var todomvc_App = function(name) {
 	this.footerTemplate = new haxe_Template("<span id=\"todo-count\"><strong>::activeTodoCount::</strong> ::activeTodoWord:: left</span>\n        <ul id=\"filters\">\n            <li>\n                <a ::if (filter == \"all\")::class=\"selected\"::end:: href=\"#/all\">All</a>\n            </li>\n            <li>\n                <a ::if (filter == \"active\")::class=\"selected\" ::end::href=\"#/active\">Active</a>\n            </li>\n            <li>\n                <a ::if (filter == \"completed\")::class=\"selected\" ::end::href=\"#/completed\">Completed</a>\n            </li>\n        </ul>\n        ::if completedTodos::<button id=\"clear-completed\">Clear completed (::completedTodos::)</button>::end::");
 	this.todoTemplate = new haxe_Template("<li data-id=\"::id::\" class=\"::completed::\">\n        <div class=\"view\">\n            <input class=\"toggle\" type=\"checkbox\" ::checked::>\n            <label>::title::</label>\n            <button class=\"destroy\"></button>\n        </div>\n        <input class=\"edit\" value=\"::title::\">\n    </li>");
 	this.filter = "all";
-	this.store = new todomvc_Store(name);
+	this.store = new todomvc.Store(name);
 	this.todos = this.store.findAll();
 	this.cacheElements();
 	this.bindEvents();
@@ -670,7 +670,7 @@ todomvc_App.prototype = {
 		var _input = new $(evt.target);
 		var val = StringTools.trim(_input.val());
 		if(evt.which != 13 || val == "") return;
-		var todo = new todomvc_Todo(val);
+		var todo = new todomvc.Todo(val);
 		if(this.store.add(todo)) this.todos.push(todo);
 		_input.val("");
 		this.render();
@@ -779,69 +779,11 @@ todomvc_App.prototype = {
 	}
 	,__class__: todomvc_App
 };
-var todomvc_Storable = function() { };
-todomvc_Storable.__name__ = true;
-todomvc_Storable.prototype = {
-	__class__: todomvc_Storable
-};
-var todomvc_Store = function(prefix) {
-	this.storage = window.localStorage;
-	this.prefix = prefix;
-	if(this.findAll() == null) this.overwrite([]);
-};
-todomvc_Store.__name__ = true;
-todomvc_Store.prototype = {
-	add: function(record) {
-		var records = this.findAll();
-		records.push(record);
-		return this.overwrite(records);
-	}
-	,findAll: function() {
-		return JSON.parse(this.storage.getItem(this.prefix));
-	}
-	,remove: function(id) {
-		var records = this.findAll();
-		var recordLen = records.length;
-		records = records.filter(function(record) {
-			return record.id != id;
-		});
-		if(records.length != recordLen) return this.overwrite(records); else return false;
-	}
-	,update: function(newRecord) {
-		this.overwrite(this.findAll().map(function(record) {
-			if(record.id == newRecord.id) return newRecord; else return record;
-		}));
-	}
-	,overwrite: function(records) {
-		try {
-			this.storage.setItem(this.prefix,JSON.stringify(records));
-		} catch( e ) {
-			if( js_Boot.__instanceof(e,EventException) ) {
-				return false;
-			} else throw(e);
-		}
-		return true;
-	}
-	,__class__: todomvc_Store
-};
-var todomvc_Todo = function(title,completed,id) {
-	if(completed == null) completed = false;
-	this.title = title;
-	this.completed = completed;
-	if(id == null) this.id = new Date().getTime(); else this.id = id;
-};
-todomvc_Todo.__name__ = true;
-todomvc_Todo.__interfaces__ = [todomvc_Storable];
-todomvc_Todo.prototype = {
-	__class__: todomvc_Todo
-};
 var $_, $fid = 0;
 function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $fid++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; o.hx__closures__[m.__id__] = f; } return f; }
 String.prototype.__class__ = String;
 String.__name__ = true;
 Array.__name__ = true;
-Date.prototype.__class__ = Date;
-Date.__name__ = ["Date"];
 var Int = { __name__ : ["Int"]};
 var Dynamic = { __name__ : ["Dynamic"]};
 var Float = Number;

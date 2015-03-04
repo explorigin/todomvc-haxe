@@ -8,6 +8,11 @@ import haxe.Json;
 /**
     Classes must implement the Storable interface to be used in the Store.
 **/
+#if sharedcode // See build.hxml for more details about sharedcode
+    @:expose // Make sure this code is available to other JS files
+#else
+    extern // Make sure this code isn't compiled otherwise
+#end
 interface Storable {
     public var id:Int;
 }
@@ -16,12 +21,18 @@ interface Storable {
 /**
     Store is a generic class that will interface with localStorage
 **/
+#if sharedcode
+    @:expose
+#else
+    extern
+#end
 class Store<T:Storable> {
     var prefix:String;
-    var storage:Storage = window.localStorage;
+    var storage:Storage;
 
-    public function new(prefix:String) {
+    public function new(prefix:String, ?storage:Storage) {
         this.prefix = prefix;
+        this.storage = if (storage == null) window.localStorage else storage;
 
         if (findAll() == null) {
             overwrite([]);
@@ -49,8 +60,8 @@ class Store<T:Storable> {
         }
     }
 
-    public function update(newRecord:T) {
-        overwrite(findAll().map(function(record) {
+    public function update(newRecord:T):Bool {
+        return overwrite(findAll().map(function(record) {
             return if (record.id == newRecord.id) newRecord else record;
         }));
     }
