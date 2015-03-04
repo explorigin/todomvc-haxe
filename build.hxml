@@ -1,4 +1,5 @@
-# The build.hxml file specifies all the command-line parameters that you would normally pass to the haxe compiler.
+# The build.hxml file specifies all the command-line parameters that you would normally pass to
+# the haxe compiler.
 
 # Add a directory for where to find source files.  You can specify multiple directories.
 -cp src
@@ -11,6 +12,9 @@
 
 # Use full dead-code elimination.
 -dce full
+
+# Adding the debug flag will generate source-maps along with our Javascript files
+-debug
 
 # Specify the entry-point into our application
 -main todomvc.App

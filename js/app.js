@@ -858,3 +858,5 @@ haxe_Template.expr_float = new EReg("^([+-]?)(?=\\d|,\\d)\\d*(,\\d*)?([Ee]([+-]?
 haxe_Template.globals = { };
 todomvc_App.main();
 })();
+
+//# sourceMappingURL=app.js.map
