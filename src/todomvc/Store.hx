@@ -5,6 +5,12 @@ import js.html.Storage;
 import haxe.Json;
 
 
+#if (haxe_ver >= 3.2)
+    typedef EventException = js.html.Exception;
+#else
+    typedef EventException = js.html.EventException;
+#end
+
 /**
     Classes must implement the Storable interface to be used in the Store.
 **/
@@ -64,7 +70,7 @@ class Store<T:Storable> {
     public function overwrite(records:Array<T>):Bool {
         try {
             storage.setItem(prefix, Json.stringify(records));
-        } catch (e:js.html.EventException) {
+        } catch (e:EventException) {
             return false;
         }
         return true;

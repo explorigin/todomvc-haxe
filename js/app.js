@@ -17,7 +17,7 @@ EReg.prototype = {
 	,matchedRight: function() {
 		if(this.r.m == null) throw "No string matched";
 		var sz = this.r.m.index + this.r.m[0].length;
-		return this.r.s.substr(sz,this.r.s.length - sz);
+		return HxOverrides.substr(this.r.s,sz,this.r.s.length - sz);
 	}
 	,matchedPos: function() {
 		if(this.r.m == null) throw "No string matched";
@@ -72,18 +72,9 @@ List.prototype = {
 	,isEmpty: function() {
 		return this.h == null;
 	}
-	,iterator: function() {
-		return { h : this.h, hasNext : function() {
-			return this.h != null;
-		}, next : function() {
-			if(this.h == null) return null;
-			var x = this.h[0];
-			this.h = this.h[1];
-			return x;
-		}};
-	}
 	,__class__: List
 };
+Math.__name__ = true;
 var Reflect = function() { };
 Reflect.__name__ = true;
 Reflect.field = function(o,field) {
@@ -92,6 +83,9 @@ Reflect.field = function(o,field) {
 	} catch( e ) {
 		return null;
 	}
+};
+Reflect.callMethod = function(o,func,args) {
+	return func.apply(o,args);
 };
 var Std = function() { };
 Std.__name__ = true;
@@ -103,9 +97,6 @@ Std.parseInt = function(x) {
 	if(v == 0 && (HxOverrides.cca(x,1) == 120 || HxOverrides.cca(x,1) == 88)) v = parseInt(x);
 	if(isNaN(v)) return null;
 	return v;
-};
-Std.parseFloat = function(x) {
-	return parseFloat(x);
 };
 var StringBuf = function() {
 	this.b = "";
@@ -163,9 +154,13 @@ haxe_Template.prototype = {
 	}
 	,resolve: function(v) {
 		if(Object.prototype.hasOwnProperty.call(this.context,v)) return Reflect.field(this.context,v);
-		var $it0 = this.stack.iterator();
-		while( $it0.hasNext() ) {
-			var ctx = $it0.next();
+		var _g_head = this.stack.h;
+		var _g_val = null;
+		while(_g_head != null) {
+			var ctx;
+			_g_val = _g_head[0];
+			_g_head = _g_head[1];
+			ctx = _g_val;
 			if(Object.prototype.hasOwnProperty.call(ctx,v)) return Reflect.field(ctx,v);
 		}
 		if(v == "__current__") return this.context;
@@ -307,7 +302,7 @@ haxe_Template.prototype = {
 			};
 		}
 		if(haxe_Template.expr_float.match(v)) {
-			var f = Std.parseFloat(v);
+			var f = parseFloat(v);
 			return function() {
 				return f;
 			};
@@ -440,9 +435,17 @@ haxe_Template.prototype = {
 			break;
 		case 4:
 			var l = e[2];
-			var $it0 = l.iterator();
-			while( $it0.hasNext() ) {
-				var e3 = $it0.next();
+			var _g_head = l.h;
+			var _g_val = null;
+			while(_g_head != null) {
+				var e3;
+				e3 = (function($this) {
+					var $r;
+					_g_val = _g_head[0];
+					_g_head = _g_head[1];
+					$r = _g_val;
+					return $r;
+				}(this));
 				this.run(e3);
 			}
 			break;
@@ -474,12 +477,20 @@ haxe_Template.prototype = {
 			var params = e[3];
 			var m = e[2];
 			var v4 = Reflect.field(this.macros,m);
-			var pl = new Array();
+			var pl = [];
 			var old = this.buf;
 			pl.push($bind(this,this.resolve));
-			var $it1 = params.iterator();
-			while( $it1.hasNext() ) {
-				var p = $it1.next();
+			var _g_head1 = params.h;
+			var _g_val1 = null;
+			while(_g_head1 != null) {
+				var p;
+				p = (function($this) {
+					var $r;
+					_g_val1 = _g_head1[0];
+					_g_head1 = _g_head1[1];
+					$r = _g_val1;
+					return $r;
+				}(this));
 				switch(p[1]) {
 				case 0:
 					var v5 = p[2];
@@ -493,7 +504,7 @@ haxe_Template.prototype = {
 			}
 			this.buf = old;
 			try {
-				this.buf.add(Std.string(v4.apply(this.macros,pl)));
+				this.buf.add(Std.string(Reflect.callMethod(this.macros,v4,pl)));
 			} catch( e7 ) {
 				var plstr;
 				try {
@@ -512,7 +523,13 @@ haxe_Template.prototype = {
 var js_Boot = function() { };
 js_Boot.__name__ = true;
 js_Boot.getClass = function(o) {
-	if((o instanceof Array) && o.__enum__ == null) return Array; else return o.__class__;
+	if((o instanceof Array) && o.__enum__ == null) return Array; else {
+		var cl = o.__class__;
+		if(cl != null) return cl;
+		var name = js_Boot.__nativeClassName(o);
+		if(name != null) return js_Boot.__resolveNativeClass(name);
+		return null;
+	}
 };
 js_Boot.__string_rec = function(o,s) {
 	if(o == null) return "null";
@@ -524,18 +541,18 @@ js_Boot.__string_rec = function(o,s) {
 		if(o instanceof Array) {
 			if(o.__enum__) {
 				if(o.length == 2) return o[0];
-				var str = o[0] + "(";
+				var str2 = o[0] + "(";
 				s += "\t";
 				var _g1 = 2;
 				var _g = o.length;
 				while(_g1 < _g) {
-					var i = _g1++;
-					if(i != 2) str += "," + js_Boot.__string_rec(o[i],s); else str += js_Boot.__string_rec(o[i],s);
+					var i1 = _g1++;
+					if(i1 != 2) str2 += "," + js_Boot.__string_rec(o[i1],s); else str2 += js_Boot.__string_rec(o[i1],s);
 				}
-				return str + ")";
+				return str2 + ")";
 			}
 			var l = o.length;
-			var i1;
+			var i;
 			var str1 = "[";
 			s += "\t";
 			var _g2 = 0;
@@ -552,12 +569,12 @@ js_Boot.__string_rec = function(o,s) {
 		} catch( e ) {
 			return "???";
 		}
-		if(tostr != null && tostr != Object.toString) {
+		if(tostr != null && tostr != Object.toString && typeof(tostr) == "function") {
 			var s2 = o.toString();
 			if(s2 != "[object Object]") return s2;
 		}
 		var k = null;
-		var str2 = "{\n";
+		var str = "{\n";
 		s += "\t";
 		var hasp = o.hasOwnProperty != null;
 		for( var k in o ) {
@@ -567,12 +584,12 @@ js_Boot.__string_rec = function(o,s) {
 		if(k == "prototype" || k == "__class__" || k == "__super__" || k == "__interfaces__" || k == "__properties__") {
 			continue;
 		}
-		if(str2.length != 2) str2 += ", \n";
-		str2 += s + k + " : " + js_Boot.__string_rec(o[k],s);
+		if(str.length != 2) str += ", \n";
+		str += s + k + " : " + js_Boot.__string_rec(o[k],s);
 		}
 		s = s.substring(1);
-		str2 += "\n" + s + "}";
-		return str2;
+		str += "\n" + s + "}";
+		return str;
 	case "function":
 		return "<function>";
 	case "string":
@@ -616,12 +633,25 @@ js_Boot.__instanceof = function(o,cl) {
 			if(typeof(cl) == "function") {
 				if(o instanceof cl) return true;
 				if(js_Boot.__interfLoop(js_Boot.getClass(o),cl)) return true;
+			} else if(typeof(cl) == "object" && js_Boot.__isNativeObj(cl)) {
+				if(o instanceof cl) return true;
 			}
 		} else return false;
 		if(cl == Class && o.__name__ != null) return true;
 		if(cl == Enum && o.__ename__ != null) return true;
 		return o.__enum__ == cl;
 	}
+};
+js_Boot.__nativeClassName = function(o) {
+	var name = js_Boot.__toStr.call(o).slice(8,-1);
+	if(name == "Object" || name == "Function" || name == "Math" || name == "JSON") return null;
+	return name;
+};
+js_Boot.__isNativeObj = function(o) {
+	return js_Boot.__nativeClassName(o) != null;
+};
+js_Boot.__resolveNativeClass = function(name) {
+	if(typeof window != "undefined") return window[name]; else return global[name];
 };
 var todomvc_App = function(name) {
 	this.footerTemplate = new haxe_Template("<span id=\"todo-count\"><strong>::activeTodoCount::</strong> ::activeTodoWord:: left</span>\n        <ul id=\"filters\">\n            <li>\n                <a ::if (filter == \"all\")::class=\"selected\"::end:: href=\"#/all\">All</a>\n            </li>\n            <li>\n                <a ::if (filter == \"active\")::class=\"selected\" ::end::href=\"#/active\">Active</a>\n            </li>\n            <li>\n                <a ::if (filter == \"completed\")::class=\"selected\" ::end::href=\"#/completed\">Completed</a>\n            </li>\n        </ul>\n        ::if completedTodos::<button id=\"clear-completed\">Clear completed (::completedTodos::)</button>::end::");
@@ -800,6 +830,7 @@ haxe_Template.expr_trim = new EReg("^[ ]*([^ ]+)[ ]*$","");
 haxe_Template.expr_int = new EReg("^[0-9]+$","");
 haxe_Template.expr_float = new EReg("^([+-]?)(?=\\d|,\\d)\\d*(,\\d*)?([Ee]([+-]?\\d+))?$","");
 haxe_Template.globals = { };
+js_Boot.__toStr = {}.toString;
 todomvc_App.main();
 })();
 
