@@ -1,4 +1,11 @@
 (function () { "use strict";
+var $estr = function() { return js_Boot.__string_rec(this,''); };
+function $extend(from, fields) {
+	function Inherit() {} Inherit.prototype = from; var proto = new Inherit();
+	for (var name in fields) proto[name] = fields[name];
+	if( fields.toString !== Object.prototype.toString ) proto.toString = fields.toString;
+	return proto;
+}
 var EReg = function(r,opt) {
 	opt = opt.split("u").join("");
 	this.r = new RegExp(r,opt);
@@ -12,15 +19,15 @@ EReg.prototype = {
 		return this.r.m != null;
 	}
 	,matched: function(n) {
-		if(this.r.m != null && n >= 0 && n < this.r.m.length) return this.r.m[n]; else throw "EReg::matched";
+		if(this.r.m != null && n >= 0 && n < this.r.m.length) return this.r.m[n]; else throw new js__$Boot_HaxeError("EReg::matched");
 	}
 	,matchedRight: function() {
-		if(this.r.m == null) throw "No string matched";
+		if(this.r.m == null) throw new js__$Boot_HaxeError("No string matched");
 		var sz = this.r.m.index + this.r.m[0].length;
 		return HxOverrides.substr(this.r.s,sz,this.r.s.length - sz);
 	}
 	,matchedPos: function() {
-		if(this.r.m == null) throw "No string matched";
+		if(this.r.m == null) throw new js__$Boot_HaxeError("No string matched");
 		return { pos : this.r.m.index, len : this.r.m[0].length};
 	}
 	,__class__: EReg
@@ -81,6 +88,7 @@ Reflect.field = function(o,field) {
 	try {
 		return o[field];
 	} catch( e ) {
+		if (e instanceof js__$Boot_HaxeError) e = e.val;
 		return null;
 	}
 };
@@ -130,17 +138,17 @@ StringTools.trim = function(s) {
 	return StringTools.ltrim(StringTools.rtrim(s));
 };
 var haxe__$Template_TemplateExpr = { __ename__ : true, __constructs__ : ["OpVar","OpExpr","OpIf","OpStr","OpBlock","OpForeach","OpMacro"] };
-haxe__$Template_TemplateExpr.OpVar = function(v) { var $x = ["OpVar",0,v]; $x.__enum__ = haxe__$Template_TemplateExpr; return $x; };
-haxe__$Template_TemplateExpr.OpExpr = function(expr) { var $x = ["OpExpr",1,expr]; $x.__enum__ = haxe__$Template_TemplateExpr; return $x; };
-haxe__$Template_TemplateExpr.OpIf = function(expr,eif,eelse) { var $x = ["OpIf",2,expr,eif,eelse]; $x.__enum__ = haxe__$Template_TemplateExpr; return $x; };
-haxe__$Template_TemplateExpr.OpStr = function(str) { var $x = ["OpStr",3,str]; $x.__enum__ = haxe__$Template_TemplateExpr; return $x; };
-haxe__$Template_TemplateExpr.OpBlock = function(l) { var $x = ["OpBlock",4,l]; $x.__enum__ = haxe__$Template_TemplateExpr; return $x; };
-haxe__$Template_TemplateExpr.OpForeach = function(expr,loop) { var $x = ["OpForeach",5,expr,loop]; $x.__enum__ = haxe__$Template_TemplateExpr; return $x; };
-haxe__$Template_TemplateExpr.OpMacro = function(name,params) { var $x = ["OpMacro",6,name,params]; $x.__enum__ = haxe__$Template_TemplateExpr; return $x; };
+haxe__$Template_TemplateExpr.OpVar = function(v) { var $x = ["OpVar",0,v]; $x.__enum__ = haxe__$Template_TemplateExpr; $x.toString = $estr; return $x; };
+haxe__$Template_TemplateExpr.OpExpr = function(expr) { var $x = ["OpExpr",1,expr]; $x.__enum__ = haxe__$Template_TemplateExpr; $x.toString = $estr; return $x; };
+haxe__$Template_TemplateExpr.OpIf = function(expr,eif,eelse) { var $x = ["OpIf",2,expr,eif,eelse]; $x.__enum__ = haxe__$Template_TemplateExpr; $x.toString = $estr; return $x; };
+haxe__$Template_TemplateExpr.OpStr = function(str) { var $x = ["OpStr",3,str]; $x.__enum__ = haxe__$Template_TemplateExpr; $x.toString = $estr; return $x; };
+haxe__$Template_TemplateExpr.OpBlock = function(l) { var $x = ["OpBlock",4,l]; $x.__enum__ = haxe__$Template_TemplateExpr; $x.toString = $estr; return $x; };
+haxe__$Template_TemplateExpr.OpForeach = function(expr,loop) { var $x = ["OpForeach",5,expr,loop]; $x.__enum__ = haxe__$Template_TemplateExpr; $x.toString = $estr; return $x; };
+haxe__$Template_TemplateExpr.OpMacro = function(name,params) { var $x = ["OpMacro",6,name,params]; $x.__enum__ = haxe__$Template_TemplateExpr; $x.toString = $estr; return $x; };
 var haxe_Template = function(str) {
 	var tokens = this.parseTokens(str);
 	this.expr = this.parseBlock(tokens);
-	if(!tokens.isEmpty()) throw "Unexpected '" + Std.string(tokens.first().s) + "'";
+	if(!tokens.isEmpty()) throw new js__$Boot_HaxeError("Unexpected '" + Std.string(tokens.first().s) + "'");
 };
 haxe_Template.__name__ = true;
 haxe_Template.prototype = {
@@ -186,7 +194,7 @@ haxe_Template.prototype = {
 				if(c == 40) npar++; else if(c == 41) {
 					npar--;
 					if(npar <= 0) break;
-				} else if(c == null) throw "Unclosed macro parenthesis";
+				} else if(c == null) throw new js__$Boot_HaxeError("Unclosed macro parenthesis");
 				if(c == 44 && npar == 1) {
 					params.push(part);
 					part = "";
@@ -231,7 +239,7 @@ haxe_Template.prototype = {
 			var eif = this.parseBlock(tokens);
 			var t1 = tokens.first();
 			var eelse;
-			if(t1 == null) throw "Unclosed 'if'";
+			if(t1 == null) throw new js__$Boot_HaxeError("Unclosed 'if'");
 			if(t1.p == "end") {
 				tokens.pop();
 				eelse = null;
@@ -239,7 +247,7 @@ haxe_Template.prototype = {
 				tokens.pop();
 				eelse = this.parseBlock(tokens);
 				t1 = tokens.pop();
-				if(t1 == null || t1.p != "end") throw "Unclosed 'else'";
+				if(t1 == null || t1.p != "end") throw new js__$Boot_HaxeError("Unclosed 'else'");
 			} else {
 				t1.p = HxOverrides.substr(t1.p,4,t1.p.length - 4);
 				eelse = this.parse(tokens);
@@ -251,7 +259,7 @@ haxe_Template.prototype = {
 			var e1 = this.parseExpr(p);
 			var efor = this.parseBlock(tokens);
 			var t2 = tokens.pop();
-			if(t2 == null || t2.p != "end") throw "Unclosed 'foreach'";
+			if(t2 == null || t2.p != "end") throw new js__$Boot_HaxeError("Unclosed 'foreach'");
 			return haxe__$Template_TemplateExpr.OpForeach(e1,efor);
 		}
 		if(haxe_Template.expr_splitter.match(p)) return haxe__$Template_TemplateExpr.OpExpr(this.parseExpr(p));
@@ -272,17 +280,19 @@ haxe_Template.prototype = {
 		var e;
 		try {
 			e = this.makeExpr(l);
-			if(!l.isEmpty()) throw l.first().p;
+			if(!l.isEmpty()) throw new js__$Boot_HaxeError(l.first().p);
 		} catch( s ) {
+			if (s instanceof js__$Boot_HaxeError) s = s.val;
 			if( js_Boot.__instanceof(s,String) ) {
-				throw "Unexpected '" + s + "' in " + expr;
+				throw new js__$Boot_HaxeError("Unexpected '" + s + "' in " + expr);
 			} else throw(s);
 		}
 		return function() {
 			try {
 				return e();
 			} catch( exc ) {
-				throw "Error : " + Std.string(exc) + " in " + expr;
+				if (exc instanceof js__$Boot_HaxeError) exc = exc.val;
+				throw new js__$Boot_HaxeError("Error : " + Std.string(exc) + " in " + expr);
 			}
 		};
 	}
@@ -317,7 +327,7 @@ haxe_Template.prototype = {
 		if(p == null || p.p != ".") return e;
 		l.pop();
 		var field = l.pop();
-		if(field == null || !field.s) throw field.p;
+		if(field == null || !field.s) throw new js__$Boot_HaxeError(field.p);
 		var f = field.p;
 		haxe_Template.expr_trim.match(f);
 		f = haxe_Template.expr_trim.matched(1);
@@ -330,18 +340,18 @@ haxe_Template.prototype = {
 	}
 	,makeExpr2: function(l) {
 		var p = l.pop();
-		if(p == null) throw "<eof>";
+		if(p == null) throw new js__$Boot_HaxeError("<eof>");
 		if(p.s) return this.makeConst(p.p);
 		var _g = p.p;
 		switch(_g) {
 		case "(":
 			var e1 = this.makeExpr(l);
 			var p1 = l.pop();
-			if(p1 == null || p1.s) throw p1.p;
+			if(p1 == null || p1.s) throw new js__$Boot_HaxeError(p1.p);
 			if(p1.p == ")") return e1;
 			var e2 = this.makeExpr(l);
 			var p2 = l.pop();
-			if(p2 == null || p2.p != ")") throw p2.p;
+			if(p2 == null || p2.p != ")") throw new js__$Boot_HaxeError(p2.p);
 			var _g1 = p1.p;
 			switch(_g1) {
 			case "+":
@@ -393,7 +403,7 @@ haxe_Template.prototype = {
 					return e1() || e2();
 				};
 			default:
-				throw "Unknown operation " + p1.p;
+				throw new js__$Boot_HaxeError("Unknown operation " + p1.p);
 			}
 			break;
 		case "!":
@@ -408,7 +418,7 @@ haxe_Template.prototype = {
 				return -e3();
 			};
 		}
-		throw p.p;
+		throw new js__$Boot_HaxeError(p.p);
 	}
 	,run: function(e) {
 		switch(e[1]) {
@@ -455,13 +465,15 @@ haxe_Template.prototype = {
 			var v2 = e4();
 			try {
 				var x = v2.iterator();
-				if(x.hasNext == null) throw null;
+				if(x.hasNext == null) throw new js__$Boot_HaxeError(null);
 				v2 = x;
 			} catch( e5 ) {
+				if (e5 instanceof js__$Boot_HaxeError) e5 = e5.val;
 				try {
-					if(v2.hasNext == null) throw null;
+					if(v2.hasNext == null) throw new js__$Boot_HaxeError(null);
 				} catch( e6 ) {
-					throw "Cannot iter on " + Std.string(v2);
+					if (e6 instanceof js__$Boot_HaxeError) e6 = e6.val;
+					throw new js__$Boot_HaxeError("Cannot iter on " + Std.string(v2));
 				}
 			}
 			this.stack.push(this.context);
@@ -506,20 +518,33 @@ haxe_Template.prototype = {
 			try {
 				this.buf.add(Std.string(Reflect.callMethod(this.macros,v4,pl)));
 			} catch( e7 ) {
+				if (e7 instanceof js__$Boot_HaxeError) e7 = e7.val;
 				var plstr;
 				try {
 					plstr = pl.join(",");
 				} catch( e8 ) {
+					if (e8 instanceof js__$Boot_HaxeError) e8 = e8.val;
 					plstr = "???";
 				}
 				var msg = "Macro call " + m + "(" + plstr + ") failed (" + Std.string(e7) + ")";
-				throw msg;
+				throw new js__$Boot_HaxeError(msg);
 			}
 			break;
 		}
 	}
 	,__class__: haxe_Template
 };
+var js__$Boot_HaxeError = function(val) {
+	Error.call(this);
+	this.val = val;
+	this.message = String(val);
+	if(Error.captureStackTrace) Error.captureStackTrace(this,js__$Boot_HaxeError);
+};
+js__$Boot_HaxeError.__name__ = true;
+js__$Boot_HaxeError.__super__ = Error;
+js__$Boot_HaxeError.prototype = $extend(Error.prototype,{
+	__class__: js__$Boot_HaxeError
+});
 var js_Boot = function() { };
 js_Boot.__name__ = true;
 js_Boot.getClass = function(o) {
@@ -567,6 +592,7 @@ js_Boot.__string_rec = function(o,s) {
 		try {
 			tostr = o.toString;
 		} catch( e ) {
+			if (e instanceof js__$Boot_HaxeError) e = e.val;
 			return "???";
 		}
 		if(tostr != null && tostr != Object.toString && typeof(tostr) == "function") {
@@ -651,7 +677,7 @@ js_Boot.__isNativeObj = function(o) {
 	return js_Boot.__nativeClassName(o) != null;
 };
 js_Boot.__resolveNativeClass = function(name) {
-	if(typeof window != "undefined") return window[name]; else return global[name];
+	return (Function("return typeof " + name + " != \"undefined\" ? " + name + " : null"))();
 };
 var todomvc_App = function(name) {
 	this.footerTemplate = new haxe_Template("<span id=\"todo-count\"><strong>::activeTodoCount::</strong> ::activeTodoWord:: left</span>\n        <ul id=\"filters\">\n            <li>\n                <a ::if (filter == \"all\")::class=\"selected\"::end:: href=\"#/all\">All</a>\n            </li>\n            <li>\n                <a ::if (filter == \"active\")::class=\"selected\" ::end::href=\"#/active\">Active</a>\n            </li>\n            <li>\n                <a ::if (filter == \"completed\")::class=\"selected\" ::end::href=\"#/completed\">Completed</a>\n            </li>\n        </ul>\n        ::if completedTodos::<button id=\"clear-completed\">Clear completed (::completedTodos::)</button>::end::");
@@ -670,7 +696,7 @@ todomvc_App.main = function() {
 };
 todomvc_App.prototype = {
 	cacheElements: function() {
-		this._todoApp = new $("#todoapp");
+		this._todoApp = $("#todoapp");
 		this._header = this._todoApp.find("#header");
 		this._main = this._todoApp.find("#main");
 		this._footer = this._todoApp.find("#footer");
@@ -691,13 +717,13 @@ todomvc_App.prototype = {
 		this._todoList.on("click",".destroy",$bind(this,this.onDestroyClick));
 	}
 	,indexFromEl: function(el) {
-		var id = new $(el).closest("li").data("id");
+		var id = $(el).closest("li").data("id");
 		var i = this.todos.length;
 		while(i-- != 0) if(this.todos[i].id == id) return i;
 		return -1;
 	}
 	,onNewTodoKeyUp: function(evt) {
-		var _input = new $(evt.target);
+		var _input = $(evt.target);
 		var val = StringTools.trim(_input.val());
 		if(evt.which != 13 || val == "") return;
 		var todo = new todomvc.Todo(val);
@@ -706,7 +732,7 @@ todomvc_App.prototype = {
 		this.render();
 	}
 	,onToggleAllChange: function(evt) {
-		var isChecked = new $(evt.target)["is"](":checked");
+		var isChecked = $(evt.target)["is"](":checked");
 		this.store.overwrite(this.todos.map(function(todo) {
 			todo.completed = isChecked;
 			return todo;
@@ -720,21 +746,21 @@ todomvc_App.prototype = {
 	}
 	,onToggleChange: function(evt) {
 		var i = this.indexFromEl(evt.target);
-		this.todos[i].completed = new $(evt.target)["is"](":checked");
+		this.todos[i].completed = $(evt.target)["is"](":checked");
 		this.store.update(this.todos[i]);
 		this.render();
 	}
 	,onLabelDoubleClick: function(evt) {
-		var _input = new $(evt.target).closest("li").addClass("editing").find(".edit");
+		var _input = $(evt.target).closest("li").addClass("editing").find(".edit");
 		_input.val(_input.val()).focus();
 	}
 	,onEditKeyUp: function(evt) {
-		if(evt.which == 13) new $(evt.target).blur();
-		if(evt.which == 27) new $(evt.target).data("abort",true).blur();
+		if(evt.which == 13) $(evt.target).blur();
+		if(evt.which == 27) $(evt.target).data("abort",true).blur();
 	}
 	,onEditBlur: function(evt) {
 		var el = evt.target;
-		var _el = new $(el);
+		var _el = $(el);
 		var val = StringTools.trim(_el.val());
 		if(_el.data("abort")) {
 			_el.data("abort",false);
