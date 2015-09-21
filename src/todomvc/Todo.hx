@@ -5,11 +5,6 @@ import Date;
 /**
     The Todo Class represents each todo list item.
 **/
-#if sharedcode
-    @:expose
-#else
-    extern
-#end
 class Todo implements todomvc.Store.Storable {
     public var id:Int;
     public var title:String;

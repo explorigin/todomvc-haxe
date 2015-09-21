@@ -22,11 +22,6 @@ interface Storable {
 /**
     Store is a generic class that will interface with localStorage
 **/
-#if sharedcode
-    @:expose
-#else
-    extern
-#end
 class Store<T:Storable> {
     var prefix:String;
     var storage:Storage;
